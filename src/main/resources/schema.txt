@@ -1,0 +1,179 @@
+{
+  "tables": [
+    {
+      "name": "MST_PARAM",
+      "type": "master",
+      "description": "Multipurpose generic parameter master table used to store many types of lookup values. Data is categorized using PARAM_TYPE.",
+      "columns": [
+        { "name": "PARAM_ID", "data_type": "NUMBER(10)", "description": "Unique identifier for parameter" },
+        { "name": "PARAM_TYPE", "data_type": "NUMBER(5)", "description": "Category of parameter. Groups lookup values (e.g., 62 for Ticket Status, 33 for Ticket Type)." },
+        { "name": "PARAM_NAME", "data_type": "VARCHAR2(500)", "description": "User readable name of the parameter value." },
+        { "name": "PARAM_DESC", "data_type": "VARCHAR2(1000)", "description": "Detailed description of the parameter value." },
+        { "name": "PARAM_SHORT_NAME", "data_type": "VARCHAR2(1000)", "description": "Short name or abbreviation of parameter." }
+      ]
+    },
+    {
+      "name": "MST_PEOPLE_DETAIL",
+      "type": "master",
+      "description": "Stores details and contact information of users.",
+      "columns": [
+        { "name": "USER_ID", "data_type": "NUMBER(10)", "description": "Unique identifier of user" },
+        { "name": "USER_NAME", "data_type": "VARCHAR2(1000)", "description": "Name of the user" },
+        { "name": "PRIMARY_MAIL_ID", "data_type": "VARCHAR2(1000)", "description": "Primary email address of the user" },
+        { "name": "SEC_MAIL_IDS", "data_type": "LONG", "description": "Secondary email addresses" },
+        { "name": "PRIMARY_NUMBER", "data_type": "VARCHAR2(100)", "description": "Primary contact number" },
+        { "name": "SEC_NUMBER", "data_type": "VARCHAR2(4000)", "description": "Secondary contact numbers" }
+      ]
+    },
+    {
+      "name": "MST_USER_GROUPS",
+      "type": "master",
+      "description": "Defines user groups used for ticket assignment and access control.",
+      "columns": [
+        { "name": "GROUP_ID", "data_type": "NUMBER(10)", "description": "Unique identifier of group" },
+        { "name": "GROUP_NAME", "data_type": "VARCHAR2(250)", "description": "Name of group" },
+        { "name": "EFFECTIVE_FROM", "data_type": "DATE", "description": "Group effective start date" },
+        { "name": "EFFECTIVE_TO", "data_type": "DATE", "description": "Group effective end date" }
+      ]
+    },
+    {
+      "name": "MST_USER_GRP_ASSOC",
+      "type": "mapping",
+      "description": "Maps users to groups.",
+      "columns": [
+        { "name": "USER_ID", "data_type": "NUMBER(10)", "description": "User identifier" },
+        { "name": "GROUP_ID", "data_type": "NUMBER(10)", "description": "Group identifier" },
+        { "name": "WEF_DATE", "data_type": "DATE", "description": "Effective from date of association" },
+        { "name": "WET_DATE", "data_type": "DATE", "description": "Effective to date of association" }
+      ]
+    },
+    {
+      "name": "MST_INITIATIVE",
+      "type": "master",
+      "description": "Contains ID and names of equipment referenced in tickets.",
+      "columns": [
+        { "name": "INITIATIVE_ID", "data_type": "NUMBER", "description": "Unique identifier of the equipment" },
+        { "name": "INITIATIVE_TYPE", "data_type": "VARCHAR2(50)", "description": "Name/type of the equipment" }
+      ]
+    },
+    {
+      "name": "TXN_TROUBLE_TICKET",
+      "type": "transaction",
+      "description": "Main transaction table storing trouble tickets raised for alarms and operational issues at telecom sites.",
+      "columns": [
+        { "name": "TICKET_ID", "data_type": "VARCHAR2(50)", "description": "Unique identifier of the ticket" },
+        { "name": "ALARM_ID", "data_type": "NUMBER(15)", "description": "ID of the alarm for which ticket was created" },
+        { "name": "GROUP_ID", "data_type": "NUMBER(15)", "description": "Group responsible for ticket (links to MST_USER_GROUPS)" },
+        { "name": "SITE_ID", "data_type": "VARCHAR2(50)", "description": "Identifier of site. User primarily uses this to identify sites." },
+        { "name": "ALARM_DESCRIPTION", "data_type": "VARCHAR2(250)", "description": "Human readable alarm text identifier" },
+        { "name": "ALARM_IN_TIME", "data_type": "DATE", "description": "Time when alarm first occurred" },
+        { "name": "ALARM_CLOSE_TIME", "data_type": "DATE", "description": "Time when alarm was closed" },
+        { "name": "TICKET_STATUS", "data_type": "NUMBER(10)", "description": "Internal status ID. Current status of ticket (values 6,7,8,5). Lookup from MST_PARAM where PARAM_TYPE = 62. TICKET_STATUS -> MST_PARAM.PARAM_ID" },
+        { "name": "ESCL_STATUS", "data_type": "NUMBER(1)", "description": "Escalation status. 1 = Normal, >1 = Escalated." },
+        { "name": "CREATED_BY", "data_type": "VARCHAR2(150)", "description": "Name of the user who created the ticket" },
+        { "name": "CREATED_DATE", "data_type": "DATE", "description": "When the ticket was created" },
+        { "name": "LAST_MODIFIED_BY", "data_type": "VARCHAR2(150)", "description": "Name of user who last modified the ticket" },
+        { "name": "LAST_MODIFIED_DATE", "data_type": "DATE", "description": "When the ticket was last modified" },
+        { "name": "USER_ID", "data_type": "NUMBER(15)", "description": "ID of the user who created the ticket. Links to MST_PEOPLE_DETAIL." },
+        { "name": "ETS_SITE_ID", "data_type": "NUMBER(10)", "description": "Alternative numeric identifier for site, ONLY IF GIVEN SITE FROM USER IS A NUMBER, USE THIS" },
+        { "name": "TELENOR_SITE_ID", "data_type": "VARCHAR2(20)", "description": "Alternative telecom site identifier" },
+        { "name": "ASSIGNED_TO", "data_type": "NUMBER(10)", "description": "Internal user identifier. Group ID ticket is assigned to. Links to MST_USER_GROUPS." },
+        { "name": "SITE_TYPE_ID", "data_type": "NUMBER(10)", "description": "Site type. Lookup from MST_PARAM where PARAM_TYPE = 5." },
+        { "name": "ALARM_TYPE", "data_type": "VARCHAR2(250)", "description": "Severity of alarm (Info, Minor, Major, Critical). Used to identify ticket criticality." },
+        { "name": "TICKET_TYPE", "data_type": "NUMBER(10)", "description": "Type of ticket. Lookup from MST_PARAM where PARAM_TYPE = 33." },
+        { "name": "EQUIPMENT_ID", "data_type": "NUMBER(10)", "description": "Equipment related to the ticket. Links to MST_INITIATIVE.INITIATIVE_ID." },
+        { "name": "ALARM_DETAIL", "data_type": "VARCHAR2(2000)", "description": "Detailed, presentable alarm information" },
+        { "name": "PROBLEM_DESC", "data_type": "VARCHAR2(4000)", "description": "Text identifier/description of the problem" },
+        { "name": "REMARKS", "data_type": "VARCHAR2(3600)", "description": "Remarks added to the ticket" },
+        { "name": "ETA", "data_type": "NUMBER(38)", "description": "Estimated time of arrival" },
+        { "name": "ETA_TIME", "data_type": "DATE", "description": "Time when ETA was provided" },
+        { "name": "ETR", "data_type": "NUMBER(38)", "description": "Estimated time of resolution" },
+        { "name": "ETR_TIME", "data_type": "DATE", "description": "Time when ETR was provided" },
+        { "name": "RCA", "data_type": "VARCHAR2(4000)", "description": "Root cause analysis of the resolved ticket" },
+        { "name": "TICKET_MODE", "data_type": "NUMBER(38)", "description": "Creation mode: 1 = System generated, 2 = Manual." },
+        { "name": "PROBLEM_START_DATE", "data_type": "DATE", "description": "Start date of the problem" },
+        { "name": "PROBLEM_END_DATE", "data_type": "DATE", "description": "End date of the problem" },
+        { "name": "PARENT_REF_TICKET_ID", "data_type": "VARCHAR2(50)", "description": "Parent ticket ID if applicable" },
+        { "name": "CHILD_REF_TICKET_ID", "data_type": "VARCHAR2(50)", "description": "Child ticket ID if applicable" },
+        { "name": "ASSIGNED_TO_DATE", "data_type": "DATE", "description": "Date ticket was assigned to a technician" },
+        { "name": "TICKET_CLOSED_BY", "data_type": "VARCHAR2(200)", "description": "Name of user who closed the ticket" },
+        { "name": "ALARM_STATUS", "data_type": "NUMBER(38)", "description": "Status code of the alarm" },
+        { "name": "RCA_CATEGORY_NAME", "data_type": "VARCHAR2(100)", "description": "Category of root cause" },
+        { "name": "RCA_SUB_CAT_NAME", "data_type": "VARCHAR2(100)", "description": "Sub category of root cause" },
+        { "name": "TICKET_RESOLVE_DATE", "data_type": "DATE", "description": "Date when ticket was resolved" },
+        { "name": "SITE_NAME", "data_type": "VARCHAR2(1000)", "description": "Human readable name of site. Serves as alternative identifier." },
+        { "name": "ALARM_START_TIME", "data_type": "DATE", "description": "Start time of the alarm" },
+        { "name": "ALARM_END_TIME", "data_type": "DATE", "description": "End time of the alarm" },
+        { "name": "ATTACHMENTS", "data_type": "VARCHAR2(4000)", "description": "Contains names of attachments if any, null otherwise." }
+      ]
+    },
+    {
+      "name": "TXN_TROUBLE_TICKET_REMARKS",
+      "type": "transaction",
+      "description": "Contains audit logs/remarks for all changes made to a ticket.",
+      "columns": [
+        { "name": "TICKET_ID", "data_type": "VARCHAR2(50)", "description": "Ticket identifier. Links to TXN_TROUBLE_TICKET." },
+        { "name": "USER_ID", "data_type": "NUMBER(15)", "description": "User who changed the ticket" },
+        { "name": "REMARKS", "data_type": "VARCHAR2(4000)", "description": "Description of what changed" },
+        { "name": "CREATED_BY", "data_type": "VARCHAR2(150)", "description": "Name of the user who changed the ticket" },
+        { "name": "CREATED_DATE", "data_type": "DATE", "description": "When the change occurred" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "GROUP_ID", "to_table": "MST_USER_GROUPS", "to_column": "GROUP_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "ASSIGNED_TO", "to_table": "MST_USER_GROUPS", "to_column": "GROUP_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "USER_ID", "to_table": "MST_PEOPLE_DETAIL", "to_column": "USER_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "TICKET_STATUS", "to_table": "MST_PARAM", "to_column": "PARAM_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "TICKET_TYPE", "to_table": "MST_PARAM", "to_column": "PARAM_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "SITE_TYPE_ID", "to_table": "MST_PARAM", "to_column": "PARAM_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET", "from_column": "EQUIPMENT_ID", "to_table": "MST_INITIATIVE", "to_column": "INITIATIVE_ID" },
+    { "from_table": "TXN_TROUBLE_TICKET_REMARKS", "from_column": "TICKET_ID", "to_table": "TXN_TROUBLE_TICKET", "to_column": "TICKET_ID" },
+    { "from_table": "MST_USER_GRP_ASSOC", "from_column": "USER_ID", "to_table": "MST_PEOPLE_DETAIL", "to_column": "USER_ID" },
+    { "from_table": "MST_USER_GRP_ASSOC", "from_column": "GROUP_ID", "to_table": "MST_USER_GROUPS", "to_column": "GROUP_ID" }
+  ],
+  "business_rules": [
+    "IMPORTANT: When joining MST_PARAM multiple times in a single query, you MUST use distinct table aliases (e.g., param_status, param_ticket_type).",
+    "Ticket status names are stored in MST_PARAM where PARAM_TYPE = 62. Expected values in TICKET_STATUS include 6, 7, 8, 5.",
+    "Ticket type names are stored in MST_PARAM where PARAM_TYPE = 33. Common IDs: 3315 (Complaint Ticket), 3316 (Suggestion), 3327 (Power Outage), 3328 (Maintenance), 3307 (Emergency Filling), 3311 (Incident), 3312 (Resolution), 3313 (Corrective Ticket), 3314 (Site Down).",
+    "Site type names are stored in MST_PARAM where PARAM_TYPE = 5.",
+    "Sites can be identified interchangeably by users via SITE_ID, SITE_NAME, ETS_SITE_ID or TELENOR_SITE_ID.",
+    "ALARM_TYPE indicates criticality. Standard values: 'Info', 'Minor', 'Major', 'Critical'.",
+    "Escalated tickets have ESCL_STATUS greater than 1. Normal tickets have ESCL_STATUS = 1.",
+    "TICKET_MODE defines creation method: 1 = System generated, 2 = Manual.",
+	"Most reports are generated using TXN_TROUBLE_TICKET as the base table."
+  ],
+  "example_queries": [
+    "Show all critical tickets for site ABC123 this month",
+    "List open tickets assigned to NOC team",
+    "Show RCA for resolved tickets last week",
+    "Show alarm details for ticket TKT12345",
+    "Give audit log history for ticket TKT12345",
+    "Show me all system-generated power outage tickets from yesterday"
+  ],
+  "join_patterns": [
+	  {
+		"description": "Get ticket status name",
+		"sql": "JOIN MST_PARAM param_status ON param_status.PARAM_ID = t.TICKET_STATUS AND param_status.PARAM_TYPE = 62"
+	  },
+	  {
+		"description": "Get ticket type name",
+		"sql": "JOIN MST_PARAM param_ticket_type ON param_ticket_type.PARAM_ID = t.TICKET_TYPE AND param_ticket_type.PARAM_TYPE = 33"
+	  },
+	  {
+		"description": "Get site type name",
+		"sql": "JOIN MST_PARAM param_site_type ON param_site_type.PARAM_ID = t.SITE_TYPE_ID AND param_site_type.PARAM_TYPE = 5"
+	  },
+	  {
+		"description": "Get tikets for site ABC",
+		"sql": "FROM TXN_TROUBLE_TICKET WHERE SITE_ID = 'ABC' || SITE_NAME = 'ABC'"
+	  },
+	  {
+		"description": "Get tikets for site 123",
+		"sql": "FROM TXN_TROUBLE_TICKET WHERE ETS_SITE_ID = '123'"
+	  }
+	],
+	"business synonyms":[
+		"ticket -> trouble ticket"
+ 	]
+}

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,8 +16,9 @@ import java.util.Map;
 public class QueryController {
     @Autowired
     private QueryService queryService;
+
     @PostMapping("/query")
-    public Map<String, String> getQuery(@RequestBody UserQuery userQuery){
-        return Map.of("message", queryService.processQuery(userQuery.getQuery()));
+    public List<Map<String, Object>> getQuery(@RequestBody UserQuery userQuery){
+        return queryService.processQuery(userQuery.getQuery());
     }
 }
